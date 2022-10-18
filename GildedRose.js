@@ -1,9 +1,98 @@
+const maxItemQuality = 50;
+
 class Item {
     constructor(name, sellIn, quality) {
         this.name = name;
         this.sellIn = sellIn;
         this.quality = quality;
     }
+
+    updateItemQuality() {
+        if (this.name !== "Sulfuras, Hand of Ragnaros") {
+            this.sellIn--;
+        }
+
+        if (this.name === "Aged Brie") {
+            if (this.sellIn < 0) {
+                this.increaseQuality(2);
+            } else {
+                this.increaseQuality(1);
+            }
+        }
+
+        if (this.name ===
+            "Backstage passes to a TAFKAL80ETC concert" || this.name === "Backstage passes to an Ice Cream Boys concert") {
+            this.checkBackstagePass();
+        }
+
+        if (this.name === "Conjured Wizard Hat" || this.name === "Conjured Wizard Robes") {
+            this.checkConjured();
+        }
+
+        if (this.name !== "Sulfuras, Hand of Ragnaros" && this.name !==
+            "Backstage passes to a TAFKAL80ETC concert" && this.name !== "Backstage passes to an Ice Cream Boys concert" && this.name !== "Aged Brie"
+            && this.name !== "Conjured Wizard Hat" && this.name !== "Conjured Wizard Robes") {
+            this.checkNormalItem();
+        }
+    }
+
+    checkBackstagePass() {
+        if (this.sellIn <= 0) {
+            this.quality = 0;
+            return;
+        }
+
+        if (this.sellIn < 11) {
+
+            if (this.sellIn < 6) {
+                this.increaseQuality(3);
+                return;
+            }
+
+            this.increaseQuality(2);
+        }
+        else {
+            this.increaseQuality(1);
+        }
+    }
+
+    checkConjured() {
+
+        if (this.sellIn < 0) {
+            this.decreaseQuality(4);
+        }
+        else {
+            this.decreaseQuality(2);
+        }
+    }
+
+    checkNormalItem() {
+        if (this.sellIn < 0) {
+            this.decreaseQuality(2);
+        }
+        else {
+            this.decreaseQuality(1);
+        }
+    }
+
+    decreaseQuality(amount) {
+        if ((this.quality - amount) < 0) {
+            this.quality = 0;
+        }
+        else {
+            this.quality -= amount;
+        }
+    }
+
+    increaseQuality(amount) {
+        if ((this.quality + amount) > maxItemQuality) {
+            this.quality = maxItemQuality;
+        }
+        else {
+            this.quality += amount;
+        }
+    }
+
 }
 
 class Shop {
@@ -13,106 +102,19 @@ class Shop {
 
     updateQuality() {
 
-        for (let i = 0; i < this.items.length; i++) {    
-
-            if (this.items[i].name !== "Sulfuras, Hand of Ragnaros") {
-                this.items[i].sellIn--;
-            }
-
-            if (this.items[i].name === "Aged Brie") {
-                if (this.items[i].sellIn < 0) {
-                    this.items[i].quality += 2;
-                } else {
-                this.items[i].quality++;
-                }
-            }
-
-            if (this.items[i].name ===
-                "Backstage passes to a TAFKAL80ETC concert" || this.items[i].name === "Backstage passes to an Ice Cream Boys concert") {
-                this.items[i].quality = this.BackstagePass(this.items[i].sellIn, this.items[i].quality);
-            }
-
-            if (this.items[i].name === "Conjured Wizard Hat" || this.items[i].name === "Conjured Wizard Robes") {
-                this.items[i].quality = this.Conjured(this.items[i].sellIn, this.items[i].quality);
-            }
-
-            if (this.items[i].name !== "Sulfuras, Hand of Ragnaros" && this.items[i].name !==
-                "Backstage passes to a TAFKAL80ETC concert" && this.items[i].name !== "Backstage passes to an Ice Cream Boys concert" && this.items[i].name !== "Aged Brie"
-                && this.items[i].name !== "Conjured Wizard Hat" && this.items[i].name !== "Conjured Wizard Robes") {
-                this.items[i].quality = this.NormalItem(this.items[i].sellIn, this.items[i].quality);
-            }
-        }
-
-        return this.items;
-
-    }
-
-    BackstagePass(sellIn, quality) {
-        if (sellIn < 5 && 0 < sellIn) {
-            quality = quality + 3;
-            return quality;
-        } else
-            if (sellIn < 10 && 5 <= sellIn) {
-                quality = quality + 2;
-                return quality;
-            } else
-                if (sellIn <= 0) {
-                    quality = 0;
-                    return quality;
-                } else {
-                    quality++;
-                    return quality;
-                }
-    }
-
-    Conjured(sellIn, quality) {
-        if (sellIn < 0) {
-            quality -= 4;
-            if (quality >= 0) {
-            return quality; 
-        } else {
-            return 0;
-        }
-    } else {
-        quality -= 2;
-        if (quality >= 0) {
-            return quality; 
-        } else {
-            return 0;
-    }
-    }
-}
-
-    NormalItem(sellIn, quality) {
-        if (sellIn < 0) {
-            if (quality > 0) {
-                quality -= 2;
-            }
-                if (quality >= 0) {
-                    return quality; 
-                } else {
-                    return 0;
-                }
-        } else {
-        if (quality > 0) {
-            quality--;
-        }
-        if (quality >= 0) {
-            return quality; 
-        } else {
-            return 0;
+        for (let i = 0; i < this.items.length; i++) {
+            this.items[i].updateItemQuality();
         }
     }
-    }
-
 
     printStock() {
         console.log('Name | Sel | Qua');
-        for (let i = 0; i < this.items.length; i++) {
-            console.log(this.items[i].name, '|', this.items[i].sellIn, '|', this.items[i].quality);
+        for (let i = 0; i < shop.items.length; i++) {
+            console.log(shop.items[i].name, '|', shop.items[i].sellIn, '|', shop.items[i].quality);
         }
     }
 }
+
 
 const shop = new Shop([
     new Item("Sulfuras, Hand of Ragnaros", 0, 80),
